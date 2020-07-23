@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: list-directory
+spec:
+  workspaces:
+    - name: directory
+  steps:
+    - name: list-directory
+      image: busybox
+      command:
+        - ls
+      args: ['-ltr', '$(workspaces.directory.path)']

@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: app-deploy-
+spec:
+  pipelineRef:
+    name: app-deploy
+  params:
+    - name: repo-url
+      value: https://github.com/kameshsampath/jo-sb-helloworld
+    - name: revision
+      value: master
+  workspaces:
+    - name: git-source
+      persistentVolumeClaim:
+        claimName: sources-pvc

@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: app-deploy
+spec:
+  params:
+    - name: repo-url
+      description: The GitHub repository url
+    - name: revision
+      description: The git source revision, tag/branch
+      default: master
+    - name: mavenMirrorUrl
+      description: The maven mirror to use for faster builds
+      default: https://repo.maven.apache.org/maven2/
+  workspaces:
+    - name: git-source
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: deleteExisting
+          value: 'true'
+      workspaces:
+        - name: output
+          workspace: git-source
+    - name: build-sources
+      runAfter:
+        - git-clone
+      taskRef:
+        name: maven
+      params:
+        - name: GOALS
+          value:
+            - -DskipTests
+            - clean
+            - package
+        - name: MAVEN_MIRROR_URL
+          value: $(params.mavenMirrorUrl)
+      workspaces:
+        - name: source
+          workspace: git-source
+        - name: maven-settings
+          workspace: git-source
+    - name: list-workspace
+      runAfter:
+        - build-sources
+      taskRef:
+        name: list-directory
+      workspaces:
+        - name: directory
+          workspace: git-source
