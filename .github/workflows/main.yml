@@ -53,7 +53,7 @@ jobs:
          with:
            push: true
            context: .
-           file: .Dockerfile
+           file: ./Dockerfile
            registry: ghcr.io
            tags: |
             ghcr.io/kameshsampath/jo-sb-helloworld:latest
